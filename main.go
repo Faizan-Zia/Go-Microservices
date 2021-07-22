@@ -1,22 +1,26 @@
 package main
 
 import (
-	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
+	"time"
+
+	"github.com/Faizan-Zia/microservices/handlers"
 )
 
 func main() {
-	http.HandleFunc("/", func(rw http.ResponseWriter, r *http.Request) {
-		d, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			http.Error(rw, "Oh no!", http.StatusBadRequest)
-			return
-		}
-		fmt.Fprintf(rw, "Hello %s", d)
-		log.Println("Get Requests")
-	})
+	l := log.New(os.Stdout, "product", log.LstdFlags)
+	hello := handlers.NewHello(l)
+	sm := http.NewServeMux()
+	sm.Handle("/", hello)
+	server := &http.Server{
+		Addr:         ":9090",
+		Handler:      sm,
+		IdleTimeout:  120 * time.Second,
+		ReadTimeout:  1 * time.Second,
+		WriteTimeout: 1 * time.Second,
+	}
+	server.ListenAndServe()
 
-	http.ListenAndServe(":9090", nil)
 }

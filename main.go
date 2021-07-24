@@ -13,9 +13,9 @@ import (
 
 func main() {
 	l := log.New(os.Stdout, "product", log.LstdFlags)
-	hello := handlers.NewHello(l)
+	product := handlers.NewProducts(l)
 	sm := http.NewServeMux()
-	sm.Handle("/", hello)
+	sm.Handle("/", product)
 	server := &http.Server{
 		Addr:         ":9090",
 		Handler:      sm,
@@ -29,6 +29,7 @@ func main() {
 			l.Fatal(err)
 		}
 	}()
+	l.Println("Listening on port 9090")
 	sigChan := make(chan os.Signal)
 	signal.Notify(sigChan, os.Interrupt)
 	signal.Notify(sigChan, os.Kill)
